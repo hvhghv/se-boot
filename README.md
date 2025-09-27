@@ -59,7 +59,7 @@ se-boot所有的后台程序输出，脚本输出都会记录在日志中
 若要查看所有日志，请查看`/var/se_boot/se_boot.log`与`/var/se_boot/se_boot_last.log`
 
 ### 编译
-一般直接敲`make`就行
-若要添加调试信息，敲`make DEBUG=1`
-若要交叉编译，修改`mkenv.mk`文件，将`CROSS`参数修改为交叉工具链
+- 一般直接敲`make`就行
+- 若要添加调试信息，敲`make DEBUG=1`
+- 若要交叉编译，修改`mkenv.mk`文件，将`CROSS`参数修改为交叉工具链
 
