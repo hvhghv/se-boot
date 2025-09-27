@@ -26,7 +26,7 @@ se-boot python3 -m http.server -b 8080 // 后台执行"python3 -m http.server -b
 ### 脚本自启
 
 #### 条件
-将"/your/path/se-boot boot" 加入到主机的自启命令中去，可通过`systemctl`, `openrc`, `/etc/inittab`等方式自行添加
+将`/your/path/se-boot boot`加入到主机的自启命令中去，可通过`systemctl`, `openrc`, `/etc/inittab`等方式自行添加
 
 #### 执行逻辑
 执行`se-boot boot`后，会自动搜索/etc/se_boot文件夹（若不存在则创建）下的脚本并执行
