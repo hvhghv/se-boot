@@ -29,7 +29,7 @@ se-boot python3 -m http.server -b 8080 // 后台执行"python3 -m http.server -b
 将`/your/path/se-boot boot`加入到主机的自启命令中去，可通过`systemctl`, `openrc`, `/etc/inittab`等方式自行添加
 
 #### 执行逻辑
-执行`se-boot boot`后，会自动搜索/etc/se_boot文件夹（若不存在则创建）下的脚本并执行
+执行`se-boot boot`后，会自动搜索/etc/se_boot文件夹（若不存在则创建）下的所有名称符合格式的脚本并执行
 
 #### 脚本格式
 文件名为`<priority>_<timeout>_<name>.sh`, 其中priority与timeout必须为2位数。priority值小的优先执行，值大的会等待值小的执行完或者超时后才执行，其值范围为00-99。timeout以秒为单位，范围为00-99，超时后停止等待脚本执行完成并选取其他脚本执行。
@@ -37,8 +37,10 @@ se-boot python3 -m http.server -b 8080 // 后台执行"python3 -m http.server -b
 #### 注意
 若要进行工作路径，环境变量，执行用户的切换，请在脚本内部编写相应内容（例如: cd/export/su）,se-boot并不提供相应的api。（工作路径，环境变量，执行用户均继承父进程）
 
-#### 示例
-下列是一个简单的脚本,文件名为`01_01_simple.sh`, 存放与/etc/se_boot中去
+#### 基本示例
+
+下列是一个简单的脚本,文件名为`01_01_simple.sh`, 存放与/etc/se_boot中
+
 ```
 #!/bin/bash
 
@@ -49,9 +51,14 @@ se-boot ls -a
 su user -c "
 cd /home/user
 export A=xxx
-se-boot python3 main.py
+se-boot python3 -m http.server -b 8080
 "
 ```
+之后执行
+- chmod +x /etc/se_boot/01_01_simple.sh
+- se-boot boot
+
+此时该脚本即会在后台运行
 
 ### 日志
 se-boot所有的后台程序输出，脚本输出都会记录在日志中
