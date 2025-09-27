@@ -39,7 +39,7 @@ se-boot python3 -m http.server -b 8080 // 后台执行"python3 -m http.server -b
 
 #### 示例
 下列是一个简单的脚本,文件名为`01_01_simple.sh`, 存放与/etc/se_boot中去
-"""
+```
 #!/bin/bash
 
 echo "hello_world"
@@ -51,7 +51,7 @@ cd /home/user
 export A=xxx
 se-boot python3 main.py
 "
-"""
+```
 
 ### 日志
 se-boot所有的后台程序输出，脚本输出都会记录在日志中
