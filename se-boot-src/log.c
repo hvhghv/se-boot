@@ -611,6 +611,10 @@ int log_read_main(int argc, char *argv[]) {
         }
     }
 
+    if (filter.filter_num == 0){
+        filter.filter_num = LOG_DEFAULT_COUNT;
+    }
+
     // 分配缓冲区
     buffer = malloc(buffer_size);
     if (!buffer) {

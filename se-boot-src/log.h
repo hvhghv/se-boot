@@ -11,6 +11,8 @@ extern "C" {
 #define LOG_TYPE_PROCESS 0
 #define LOG_TYPE_BOOT 1
 
+#define LOG_DEFAULT_COUNT 30
+
 
 
 int log_write(int type, int pid, const char *path, const char *name, const char *msg);
