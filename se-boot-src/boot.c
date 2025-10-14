@@ -46,17 +46,44 @@ void boot_main() {
         }
     }
 
-    daemonize();
+    pid_t process_t1 = fork();
+    
+    if (process_t1 < 0){
+        return;
+    }
+    if (process_t1 > 0){
+        waitpid(process_t1, NULL, 0);
+        return;
+    }
+
+    process_t1 = getpid();
+
+    pid_t process_t2 = fork();
+    if (process_t2 < 0){
+        return;
+    }
+    if (process_t2 > 0){
+        pause();
+        return;
+    }
+
+    if (daemonize() < 0){
+        kill(process_t1, SIGUSR1);
+        return;
+    }
+
 
     /* 第3步：写入当前PID到文件 */
     FILE *pid_file = fopen(SE_PID_FILE, "w");
     if (!pid_file) {
         log_write(LOG_TYPE_BOOT, getpid(), "/", "se-boot", strerror(errno));
+        kill(process_t1, SIGUSR1);
         return;
     }
 
     fprintf(pid_file, "%d", getpid());
     fclose(pid_file);
+    kill(process_t1, SIGUSR1);
 
     /* 第4步：执行/etc/sm_init下的脚本 */
 

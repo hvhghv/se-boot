@@ -2,7 +2,7 @@
 
 TOP = .
 
-CROSS = 
+CROSS =
 CC = $(CROSS)gcc
 CXX = $(CROSS)g++
 LD = $(CROSS)ld
