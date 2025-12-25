@@ -6,6 +6,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
+#include <sys/file.h>
 #include <fcntl.h>
 #include <signal.h>
 #include <ctype.h>
@@ -30,19 +31,22 @@ static int script_compare(const void *a, const void *b) {
 }
 
 void boot_main() {
-    /* 第1步：检查PID文件是否存在 */
-    if (access(SE_PID_FILE, F_OK) == 0) {
-        /* 第2步：检查文件中的PID是否仍在运行 */
-        FILE *pid_file = fopen(SE_PID_FILE, "r");
-        if (pid_file) {
-            pid_t old_pid;
-            if (fscanf(pid_file, "%d", &old_pid) == 1) {
-                if (process_exists(old_pid)) {
-                    fclose(pid_file);
-                    return; // 进程存在则退出
-                }
-            }
-            fclose(pid_file);
+
+    /* 第1步：确保存在 */
+    int lock_file = open(SE_LOCK, O_CREAT|O_RDWR, 0666);
+
+    if (lock_file == -1){
+        log_write(LOG_TYPE_BOOT, getpid(), "/", "se-boot", strerror(errno));
+        return;
+    }
+
+    if (flock(lock_file, LOCK_EX | LOCK_NB) == -1){
+        if (errno == EWOULDBLOCK){
+            return;
+        }
+        else{
+            log_write(LOG_TYPE_BOOT, getpid(), "/", "se-boot", strerror(errno));
+            return;
         }
     }
 
@@ -85,7 +89,7 @@ void boot_main() {
     fclose(pid_file);
     kill(process_t1, SIGUSR1);
 
-    /* 第4步：执行/etc/sm_init下的脚本 */
+    /* 第4步：执行/etc/se_init下的脚本 */
 
     struct stat st = {0};
     if (stat(SCRIPT_DIR, &st) == -1) {
@@ -106,7 +110,7 @@ void boot_main() {
     struct dirent *entry;
     char msg[1200];
     while ((entry = readdir(dir)) != NULL) {
-        /* 检查文件名格式：前两位为数字，第三位是下划线 */
+        /* 检查文件名格式：2位为优先级，第3位是下划线， 第4第5为超时秒，第6位下划线*/
         if (strlen(entry->d_name) < 6)
             continue;
         if (!isdigit(entry->d_name[0]) ||
